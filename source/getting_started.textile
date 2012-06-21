@@ -1,0 +1,183 @@
+h2. Getting Started with Railsyard
+
+This guide covers getting up and running with Railsyard. After reading it,
+you should be familiar with:
+
+* Installing Railsyard
+* The general layout of a Railsyard-powered application
+* How to quickly generate the starting pieces of a Railsyard application
+
+endprologue.
+
+WARNING. This guide is designed for developers already familiar with Ruby
+and Rails. If that's not the case, we strongly suggest you to check out the
+"Rails Guides":http://guides.rubyonrails.org/, and come back here later.
+
+h3. What is Railsyard?
+
+Railsyard is a modular Rails 3 engine that provides an out-of-the-box
+administrative interface for your application models. Think of it like
+a _CMS backend generator_.
+
+NOTE. One of the core principles in Railsyard is that models and frontend
+development are too application-specific to be managed by some external gem.
+For this reason, Railsyard handles just the backend section of your application,
+leaving you full Rails power to create models and frontend views.
+
+Railsyard totally embraces default Rails conventions, so anyone familiar
+with Rails can start generating backends in just minutes.
+
+Railsyard has been built with modularity in mind, so it's not a monolithic,
+all-included backend gem. Each Railsyard application is composed by different
+hand-picked gems, everyone acting as a basic "building block".
+
+Possible building blocks can be for example:
+
+* Importing and exporting of models into multiple formats (CSV, XML, Excel);
+* Authentication (and authorization) of backend administrators;
+* Dashboard widgets;
+* Media management (image upload, etc.);
+* Multilanguage support;
+* The list goes on :)
+
+Each of this logic blocks can (or cannot) be required by a specific backend
+application. Even two applications which both need the same type of block,
+would probably need different behaviours, specific to their domains
+
+Railsyard's main idea is to provide one official plugin (in the form of a gem)
+ to manage each specific problem, but without forcing you to use them, and
+making it very simple to write alternative solutions. That means an emergency
+exit is always guaranteed.
+
+This approach enables developers to create in no time uncluttered, easy-to-understand,
+customized backend interfaces, built upon the exact requirements of their clients.
+
+h3. Creating your first Railsyard backend
+
+The best way to use this guide is to follow each step as it happens, no code or
+step needed to make this example application has been left out, so you can
+literally follow along step by step.
+
+By following along with this guide, you'll create a Railsyard project called
++portfolio+, a simple CMS-powered application.
+
+NOTE. Before you can start building the application, you need to make sure that you have Rails
+itself installed: just use the +gem install+ command provided by RubyGems.
+
+h4. Creating a Portfolio application
+
+Just like any Rails application, let's start creating the default skeleton for our app.
+
+<shell>
+$ rails new portfolio
+</shell>
+
+After you create the +portfolio+ application, let's open up the +Gemfile+ and add the
++railsyard-backend+ gem, the core gem for each Railsyard-powered application.
+
+<ruby>
+source 'https://rubygems.org'
+# other gems here...
+gem 'railsyard-backend', github: 'cantierecreativo/railsyard-backend', branch: 'develop'
+</ruby>
+
+After running +bundle install+ from your terminal again, start your +rails server+
+and visit "http://0.0.0.0:3000/backend":http://0.0.0.0:3000/backend, you should already
+see the following:
+
+!images/getting_started/step_1.png(Our empty backend)!
+
+h4. Data modelling, Railsyard editors and plugins
+
+Our +portfolio+ app is a classic brochure website. For now, we just want it to have a
+collection of custom-sorted works, and an "Our Team" page.
+
+We will obviously need a WYSIWYG editor for some of the fields present in our
+Railsyard backend, so let's add the +railsyard-wysihtml5+ plugin to our +Gemfile+:
+
+<ruby>
+gem 'railsyard-wysihtml5', github: 'cantierecreativo/railsyard-wysihtml5'
+</ruby>
+
+We will also need some upload field, so let's add the +railsyard-dragonfly+ gem,
+which makes the +dragonfly+ functionality available into our backend:
+
+<ruby>
+gem 'railsyard-dragonfly', github: 'cantierecreativo/railsyard-dragonfly'
+</ruby>
+
+NOTE. As you already have guessed, the +railsyard-wysihtml5+ gem is just one of the
+possible plugins that implement the concept of a WYSIWYG editor. Maybe you prefer
++carrierwave+ or +paperclip+ to handle uploads? Use or create a plugin for that.
+You are in charge of choosing the right tool for your job, and can always find a
+catalog of all the available plugins on the "Railsyard Extension Page":http://foobar.com.
+
+After a +bundle install+ we can generate the +Work+ model. Railsyard comes with a
+handy generator for that, similar to the default +rails generate model+ that Rails
+gives you:
+
+<shell>
+› rails g railsyard:editor Work title:string content:wysihtml5 image:dragonfly position:integer
+      create  db/migrate/20120620145718_create_works.rb
+      create  app/models/work.rb
+      create  app/backend/works_editor.rb
+</shell>
+
+The +position+ field will hold the custom ordering of the different works. As you can
+see, instead of specifying basic field types (ie. +integer+), we can directly specify
+the field type to show on the Railsyard backend (ie. +wysihtml5+ and +dragonfly+ in
+this case).
+
+Railsyard will create the migration accordingly:
+
+<ruby>
+class CreateWorks < ActiveRecord::Migration
+  def change
+    create_table :works do |t|
+      t.string  :title
+      t.text    :content
+      t.string  :image_uid
+      t.string  :image_name
+      t.integer :position
+      t.timestamps
+    end
+  end
+end
+</ruby>
+
+Now run +rake db:migrate+ and navigate to "http://0.0.0.0:3000/backend/works/new".
+You should see the following (fully functional) form:
+
+!images/getting_started/step_2.png(A working form, already?!)!
+
+Time for a big hurray!
+
+h3. Railsyard editors
+
+The way you can add models to the Railsyard backend is to create editors. Togheter with the
+creation of the +app/models/work.rb+ model and +db/migrations/XXX_create_works.rb+ migration
+file, the Railsyard generator has created a +app/backend/works_editor.rb+ file.
+
+<ruby>
+Railsyard::Backend.define_editor_for Work do
+
+  list do
+    label :title
+    field :created_at
+  end
+
+  edit do
+    field :title
+    field :content, as: :wysihtml5 do
+      input_options toolbar:
+        {commands: [:bold, :italic, :link, :image, :unordered_list, :ordered_list, :source]} # any of these
+    end
+    field :image, as: :dragonfly do
+      input_options components: [ :preview, :upload, :url, :remove ] # any of these
+    end
+    field :position
+  end
+
+end
+</ruby>
+

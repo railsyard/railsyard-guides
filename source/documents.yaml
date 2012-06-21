@@ -1,0 +1,39 @@
+-
+  name: Start Here
+  documents:
+    -
+      name: Getting Started with Railsyard
+      url: getting_started.html
+      description: Everything you need to know to install Railsyard and create your first CMS-powered website.
+-
+  name: Defining Editors
+  documents:
+    -
+      name: Rails Database Migrations
+      url: migrations.html
+      description: This guide covers how you can use Active Record migrations to alter your database in a structured and organized manner.
+      work_in_progress: true
+-
+  name: Dashboard Widgets
+  documents:
+    -
+      name: Action Controller Overview
+      url: action_controller_overview.html
+      description: This guide covers how controllers work and how they fit into the request cycle in your application. It includes sessions, filters, and cookies, data streaming, and dealing with exceptions raised by a request, among other topics.
+      work_in_progress: true
+-
+  name: Extending Railsyard
+  documents:
+    -
+      name: The Basics of Creating Rails Plugins
+      url: plugins.html
+      description: This guide covers how to build a plugin to extend the functionality of Rails.
+      work_in_progress: true
+-
+  name: Contributing to Ruby on Rails
+  documents:
+    -
+      name: Contributing to Ruby on Rails
+      url: contributing_to_ruby_on_rails.html
+      description: Rails is not 'somebody else's framework.' This guide covers a variety of ways that you can get involved in the ongoing development of Rails.
+      work_in_progress: true

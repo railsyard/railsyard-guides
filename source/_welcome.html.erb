@@ -1,0 +1,16 @@
+<h2>Railsyard Guides (<%= @version %>)</h2>
+
+<% if @edge %>
+<p>
+  These are <b>Edge Guides</b>, based on the current <a href="https://github.com/cantierecreativo/railsyard-backend/tree/<%= @version %>"><%= @version %></a> branch.
+</p>
+<p>
+  If you are looking for the ones for the stable version, please check
+  <a href="http://guides.railsyardcms.org">http://guides.railsyardcms.org</a> instead.
+</p>
+<% else %>
+<p>
+  These are the new guides for Railsyard 3.0 based on <a href="https://github.com/cantierecreativo/railsyard-backend/tree/<%= @version %>"><%= @version %></a>.
+  These guides are designed to make you immediately productive with Railsyard, and to help you understand how all of the pieces fit together.
+</p>
+<% end %>
